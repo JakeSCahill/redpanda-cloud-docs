@@ -20,9 +20,7 @@ jobs:
               | jq -r '.[] | select(.object.type == "Issue").object.number' \
               | tr '\n' ',')
           echo "Found linked issues: ${ISSUES%,}"
-          env:
-            ISSUES: ${{ ISSUES }}
-
+          echo "ISSUES=${ISSUES%,}" >> $GITHUB_ENV
 
       - name: Assign labels
         if: env.ISSUES != ''
