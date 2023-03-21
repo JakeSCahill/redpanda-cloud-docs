@@ -2,7 +2,7 @@ name: Assign Labels from Linked Issues
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, reopened, synchronize]
 
 jobs:
   assign_labels:
@@ -11,22 +11,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Get linked issues
-        id: linked_issues
-        run: |
-          ISSUES=$(curl -s "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/links" \
-              -H "Accept: application/vnd.github+json" \
-              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-              | jq -r '.[] | select(.object.type == "Issue").object.number' \
-              | tr '\n' ',')
-          echo "Found linked issues: ${ISSUES%,}"
-          echo "ISSUES=${ISSUES%,}" >> $GITHUB_ENV
+      - name: Check linked issues
+        id: check_linked_issues
+        uses: nearform-actions/github-action-check-linked-issues@v1.4.9
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Assign labels
-        if: env.ISSUES != ''
+        if: steps.check_linked_issues.outputs.linked_issues != ''
         run: |
-          echo "Linked issues: ${{ env.ISSUES }}"
-          issues=$(echo "${{ env.ISSUES }}" | sed -e 's/\s/,/g')
+          echo "Linked issues: ${{ steps.check_linked_issues.outputs.linked_issues }}"
+          issues=$(echo "${{ steps.check_linked_issues.outputs.linked_issues }}" | sed -e 's/\s/,/g')
           echo "Issues with labels: $issues"
           echo "Pull request number: ${{ github.event.pull_request.number }}"
           curl -X POST \
