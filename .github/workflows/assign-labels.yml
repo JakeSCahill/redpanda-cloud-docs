@@ -15,7 +15,7 @@ jobs:
         id: check_linked_issues
         uses: nearform-actions/github-action-check-linked-issues@v1.4.9
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Assign labels
         if: steps.check_linked_issues.outputs.linked_issues != ''
