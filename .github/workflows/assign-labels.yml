@@ -7,13 +7,15 @@ on:
 jobs:
   assign_labels:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Check linked issues
         id: check_linked_issues
-        uses: nearform-actions/github-action-check-linked-issues@v1.4.9
+        uses: nearform/github-action-check-linked-issues@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
