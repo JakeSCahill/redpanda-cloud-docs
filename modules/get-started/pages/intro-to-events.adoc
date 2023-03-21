@@ -1,4 +1,4 @@
-= Introduction to Redpanda {page-version}
+= Introduction to Redpanda Cloud
 :pp: {plus}{plus}
 :description: Explanation of Redpanda event streaming.
 

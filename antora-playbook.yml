@@ -1,6 +1,6 @@
 site:
   title: Redpanda Docs
-  start_page: redpanda:get-started:intro-to-events.adoc
+  start_page: cloud:get-started:intro-to-events.adoc
 content:
   sources:
   - url: .

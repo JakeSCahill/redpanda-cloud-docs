@@ -1,4 +1,4 @@
-= How Redpanda Works
+= How Redpanda Cloud Works
 :description: Overview of Redpanda architecture.
 
 test
