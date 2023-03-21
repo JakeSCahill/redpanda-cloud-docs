@@ -1,0 +1,31 @@
+name: Assign Labels from Linked Issues
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  assign_labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get linked issues
+        id: linked_issues
+        uses: peter-evans/find-linked-issues@v2.1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Assign labels
+        if: steps.linked_issues.outputs.issues != ''
+        run: |
+          echo "Linked issues: ${{ steps.linked_issues.outputs.issues }}"
+          issues=$(echo "${{ steps.linked_issues.outputs.issues }}" | sed -e 's/\s/,/g')
+          echo "Issues with labels: $issues"
+          echo "Pull request number: ${{ github.event.pull_request.number }}"
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${issues}/labels" \
+            -d "{\"labels\":$(curl -H \"Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}\" -H \"Accept: application/vnd.github.v3+json\" https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/labels | jq -r '.[].name' | sed -e 's/\"/\\\"/g' -e 's/.*/\"&\"/g' | paste -sd,) }"
