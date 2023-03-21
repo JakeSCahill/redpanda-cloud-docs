@@ -17,10 +17,12 @@ jobs:
           ISSUES=$(curl -s "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/links" \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-              | jq -r '.[] | select(.type == "issue").target.number' \
+              | jq -r '.[] | select(.object.type == "Issue").object.number' \
               | tr '\n' ',')
           echo "Found linked issues: ${ISSUES%,}"
-          echo "::set-env name=ISSUES::${ISSUES%,}"
+          env:
+            ISSUES: ${{ ISSUES }}
+
 
       - name: Assign labels
         if: env.ISSUES != ''
