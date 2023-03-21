@@ -15,7 +15,7 @@ jobs:
 
       - name: Check linked issues
         id: check_linked_issues
-        uses: nearform/github-action-check-linked-issues@v1
+        uses: nearform-actions/github-action-check-linked-issues@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
