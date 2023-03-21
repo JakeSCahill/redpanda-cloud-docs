@@ -2,7 +2,7 @@ name: Assign Labels from Linked Issues
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [opened]
 
 jobs:
   assign_labels:
@@ -17,15 +17,16 @@ jobs:
           ISSUES=$(curl -s "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/links" \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-              | jq -r '.[] | select(.object.type == "Issue").object.number' \
+              | jq -r '.[] | select(.type == "issue").target.number' \
               | tr '\n' ',')
-          echo "::set-output name=issues::${ISSUES%,}"
+          echo "Found linked issues: ${ISSUES%,}"
+          echo "::set-env name=ISSUES::${ISSUES%,}"
 
       - name: Assign labels
-        if: steps.linked_issues.outputs.issues != ''
+        if: env.ISSUES != ''
         run: |
-          echo "Linked issues: ${{ steps.linked_issues.outputs.issues }}"
-          issues=$(echo "${{ steps.linked_issues.outputs.issues }}" | sed -e 's/\s/,/g')
+          echo "Linked issues: ${{ env.ISSUES }}"
+          issues=$(echo "${{ env.ISSUES }}" | sed -e 's/\s/,/g')
           echo "Issues with labels: $issues"
           echo "Pull request number: ${{ github.event.pull_request.number }}"
           curl -X POST \
