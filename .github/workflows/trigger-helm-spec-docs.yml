@@ -6,8 +6,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'src/js/**'
-      - 'src/img/**'
+      - 'modules/**'
 
 jobs:
   dispatch:
