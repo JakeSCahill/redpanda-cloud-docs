@@ -1,0 +1,22 @@
+# This workflow triggers the actions in redpanda-data/documentation that publishes the Helm specification to the Redpanda documentation.
+
+name: Trigger Helm spec docs
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/js/**'
+      - 'src/img/**'
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger build
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -H "Accept: application/vnd.github.everest-preview+json" \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -d '{"event_type": "generate-helm-spec-docs", "client_payload": {}}' \
+          https://api.github.com/repos/JakeSCahill/redpanda-docs-antora/dispatches
